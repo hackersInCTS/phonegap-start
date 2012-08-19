@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns		= "http://www.w3.org/ns/widgets"
 	xmlns:gap	= "http://phonegap.com/ns/1.0"
-	id		= "U8HC4KX8PM.*"
+	id		= "U8HC4KX8PM.com.cognizanthackathon.insurance"
 	version 	= "1.0.0">
 
 	<name>PhoneGap: Getting Started</name>
