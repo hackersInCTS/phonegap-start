@@ -193,7 +193,7 @@ Spinach.Map = (function ($) {
                     'message: ' + error.message + '\n');
             };
             var geoLocationOptions = { maximumAge:1000, timeout:3000, enableHighAccuracy:true };
-            navigator.geolocation.watchPosition(onGetPositionSuccess, onGetPositionError, geoLocationOptions);
+            navigator.geolocation.getCurrentPosition(onGetPositionSuccess, onGetPositionError, geoLocationOptions);
         },
         plotMap:function (mapViewModel) {
             $('#mapPlotImg').attr('src', mapViewModel.getMapUrl());
