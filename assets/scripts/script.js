@@ -77,9 +77,31 @@ Spinach.Home = (function ($) {
             Spinach.Home.goToMapPage();
         },
         goToMapPage:function () {
+        
             Spinach.Map.resetMaps();
             $.mobile.changePage($('#map'));
+        },
+        getCurrentAcceleration: function(){        
+        	var alertAcceleration = function(acceleration){
+        	alert('Acceleration X: ' + acceleration.x + '\n' +
+              'Acceleration Y: ' + acceleration.y + '\n' +
+              'Acceleration Z: ' + acceleration.z + '\n' +
+              'Timestamp: '      + acceleration.timestamp + '\n');
+        	};
+        	var alertAccelerationError = function(){
+        	alert('onError!');
+        	};
+        	Spinach.Accelerometer.getAcceleration(alertAcceleration,alertAccelerationError);
+        	
+        },
+        goToWacthAccelerationPage: function(){        
+        $.mobile.changePage($('#watchacceleration'));
+        },
+        getSpeedAndLocation : function(){
+        
+        Spinach.Map.getSpeedAndLocation();
         }
+        
     };
 }(jQuery));
 
@@ -156,12 +178,73 @@ Spinach.Map = (function ($) {
                 Spinach.Common.alert('code: ' + error.code + '\n' +
                     'message: ' + error.message + '\n');
             };
-            var geoLocationOptions = { maximumAge:30000, timeout:1000, enableHighAccuracy:true };
+            var geoLocationOptions = { maximumAge:1000, timeout:3000, enableHighAccuracy:true };
             navigator.geolocation.getCurrentPosition(onGetPositionSuccess, onGetPositionError, geoLocationOptions);
+        },
+        getSpeedAndLocation:function () {
+            
+            var onGetPositionSuccess = function (position) {
+                alert('Lat: ' + position.coords.latitude + '\n' +
+              'Long: ' + position.coords.longitude + '\n' +
+              'Speed: ' + position.coords.speed + '\n');
+            };
+            var onGetPositionError = function (error) {
+                Spinach.Common.alert('code: ' + error.code + '\n' +
+                    'message: ' + error.message + '\n');
+            };
+            var geoLocationOptions = { maximumAge:1000, timeout:3000, enableHighAccuracy:true };
+            navigator.geolocation.watchPosition(onGetPositionSuccess, onGetPositionError, geoLocationOptions);
         },
         plotMap:function (mapViewModel) {
             $('#mapPlotImg').attr('src', mapViewModel.getMapUrl());
         }
+    };
+}(jQuery));
+
+
+Spinach.Accelerometer=(function ($) {
+var watchID;
+    return {
+    
+    getAcceleration:function(onSuccess,onError){
+    	navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
+    },
+    watchAcceleration:function(onSuccess, onError, options){
+    
+    	watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+    	
+    },
+    clearWatch:function(){
+    
+	    if (watchID) {
+	            navigator.accelerometer.clearWatch(watchID);
+	            watchID = null;
+	        }
+    }
+    
+    };
+}(jQuery));
+
+Spinach.WatchAccelerometerDialog=(function ($) {
+    return {  
+    
+    watchAcceleration:function(){
+    	var interval=$("input[type='radio']:checked").val();
+    	
+    	var options = { frequency: interval };
+    	var onSuccess = function (acceleration){
+    	alert('Acceleration X: ' + acceleration.x + '\n' +
+              'Acceleration Y: ' + acceleration.y + '\n' +
+              'Acceleration Z: ' + acceleration.z + '\n' +
+              'Timestamp: '      + acceleration.timestamp + '\n');
+    	};
+    	var onError = function (error){
+    	alert('error!');
+    	};
+    	
+    	if(interval){    	
+    	Spinach.Accelerometer.watchAcceleration(onSuccess,onError,options);}
+    }    
     };
 }(jQuery));
 
@@ -182,4 +265,9 @@ $(document).ready(function () {
     $(document).on('deviceready', Spinach.Home.deviceReady);
     $(document).on('click', '#CurrentLocation', Spinach.Home.currentLocationClick);
     $(document).on('click', '#PlotSpecificLocationButton', Spinach.Dialog.plotSpecificLocationClick);
+    $(document).on('click', '#GetSpeedAndLocation', Spinach.Home.getSpeedAndLocation);    
+    $(document).on('click', '#GetAcceleration', Spinach.Home.getCurrentAcceleration);    
+    $(document).on('click', '#openWatchAcceleration', Spinach.Home.goToWacthAccelerationPage);
+    $(document).on('click', '#watchAccelerationButton', Spinach.WatchAccelerometerDialog.watchAcceleration);
+    $(document).on('click', '#clearWatch', Spinach.Accelerometer.clearWatch);
 });
